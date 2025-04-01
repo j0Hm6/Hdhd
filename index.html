@@ -44,7 +44,8 @@
     <div id="game-container">
         <h2 id="player-name"></h2>
         <div id="role-display"></div>
-        <button id="understand-btn">Anladım</button>
+        <button id="show-role-btn">Göster</button>
+        <button id="understand-btn" style="display: none;">Anladım</button>
         <div id="timer" style="display: none;">Game has started!</div>
     </div>
 
@@ -91,7 +92,16 @@
         // Display the current player's name
         function showPlayer() {
             document.getElementById('player-name').textContent = players[currentPlayerIndex];
-            displayRole(); // Display the role immediately after showing the player's name
+            showRoleButton(); // Show the "Göster" button after displaying the player's name
+        }
+
+        // Show the "Göster" button, which reveals the role
+        function showRoleButton() {
+            const roleDisplay = document.getElementById('role-display');
+            document.getElementById('show-role-btn').style.display = 'inline-block';
+            document.getElementById('show-role-btn').addEventListener('click', function() {
+                displayRole();
+            });
         }
 
         // Display the role (Word or Spy)
@@ -102,6 +112,7 @@
             } else {
                 roleDisplay.textContent = `Your word is: ${wordForNonSpies}`;
             }
+            document.getElementById('show-role-btn').style.display = 'none';
             document.getElementById('understand-btn').style.display = 'inline-block';
         }
 
