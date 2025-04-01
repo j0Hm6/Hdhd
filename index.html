@@ -43,9 +43,7 @@
 
     <div id="game-container">
         <h2 id="player-name"></h2>
-        <button id="show-role-btn">Show Role</button>
-        <button id="ok-btn" style="display: none;">OK</button>
-        <button id="restart-btn" style="display: none;">Restart Game</button>
+        <div id="role-display"></div>
         <div id="timer" style="display: none;">Time left: 10:00</div>
     </div>
 
@@ -94,44 +92,31 @@
         // Display the current player's name
         function showPlayer() {
             document.getElementById('player-name').textContent = players[currentPlayerIndex];
-            document.getElementById('show-role-btn').style.display = 'inline-block';
-            document.getElementById('ok-btn').style.display = 'none';
+            displayRole(); // Display the role immediately after showing the player's name
         }
 
-        // Show the role when clicked
-        document.getElementById('show-role-btn').addEventListener('click', function () {
+        // Display the role (Word or Spy)
+        function displayRole() {
+            const roleDisplay = document.getElementById('role-display');
             if (playerRoles[currentPlayerIndex] === 'Spy') {
-                alert('You are the Spy!');
+                roleDisplay.textContent = 'You are the Spy!';
             } else {
-                alert(`Your word is: ${wordForNonSpies}`);
+                roleDisplay.textContent = `Your word is: ${wordForNonSpies}`;
             }
-            document.getElementById('show-role-btn').style.display = 'none';
-            document.getElementById('ok-btn').style.display = 'inline-block';
-        });
+            setTimeout(nextPlayer, 3000); // Wait 3 seconds before moving to the next player
+        }
 
-        // Proceed to the next player when clicked "OK"
-        document.getElementById('ok-btn').addEventListener('click', function () {
+        // Proceed to the next player automatically after a few seconds
+        function nextPlayer() {
             currentPlayerIndex++;
             if (currentPlayerIndex < players.length) {
                 showPlayer();
             } else {
-                document.getElementById('ok-btn').style.display = 'none';
-                document.getElementById('restart-btn').style.display = 'inline-block';
-                startTimer(); // Start the timer after the last player
+                document.getElementById('role-display').textContent = "All players have seen their roles!";
+                document.getElementById('timer').style.display = 'inline-block';
+                startTimer(); // Start the timer after the last player has viewed their role
             }
-        });
-
-        // Restart the game without re-entering names
-        document.getElementById('restart-btn').addEventListener('click', function () {
-            currentPlayerIndex = 0;
-            playerRoles = assignRoles(players.length);  // Reassign roles for a new round
-            wordForNonSpies = getRandomWord(); // Get a new word for non-spies
-            document.getElementById('player-name').textContent = players[currentPlayerIndex]; // Show first player's name
-            document.getElementById('show-role-btn').style.display = 'inline-block';
-            document.getElementById('ok-btn').style.display = 'none';
-            document.getElementById('restart-btn').style.display = 'none';
-            resetTimer(); // Reset the timer
-        });
+        }
 
         // Randomly select a word from the list
         function getRandomWord() {
@@ -141,7 +126,6 @@
 
         // Start the chronometer once the last player has viewed their role
         function startTimer() {
-            document.getElementById('timer').style.display = 'inline-block';
             timer = setInterval(function () {
                 if (timeLeft <= 0) {
                     clearInterval(timer);
@@ -165,11 +149,21 @@
             return num < 10 ? '0' + num : num;
         }
 
+        // Restart the game without re-entering names
+        function resetGame() {
+            currentPlayerIndex = 0;
+            playerRoles = assignRoles(players.length);  // Reassign roles for a new round
+            wordForNonSpies = getRandomWord(); // Get a new word for non-spies
+            document.getElementById('player-name').textContent = players[currentPlayerIndex]; // Show first player's name
+            document.getElementById('role-display').textContent = '';
+            document.getElementById('timer').style.display = 'none';
+            resetTimer(); // Reset the timer
+        }
+
         // Reset the timer for the next round
         function resetTimer() {
             timeLeft = 600; // Reset to 10 minutes (600 seconds)
             updateTimerDisplay();
-            document.getElementById('timer').style.display = 'none';
         }
     </script>
 </body>
