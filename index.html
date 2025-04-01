@@ -54,6 +54,7 @@
         let currentPlayerIndex = 0;
         let playerRoles = [];
 
+        // Start Game after entering names
         document.getElementById('start-btn').addEventListener('click', function () {
             let names = document.getElementById('player-names').value;
             players = names.split(',').map(name => name.trim());
@@ -64,6 +65,7 @@
             }
         });
 
+        // Initialize the game
         function startGame() {
             document.querySelector('input').style.display = 'none';
             document.getElementById('start-btn').style.display = 'none';
@@ -72,6 +74,7 @@
             showPlayer();
         }
 
+        // Assign roles to players (one spy and others are word holders)
         function assignRoles(playerCount) {
             let roles = Array(playerCount).fill('Word');
             const spyIndex = Math.floor(Math.random() * playerCount);
@@ -79,12 +82,14 @@
             return roles;
         }
 
+        // Display the current player's name
         function showPlayer() {
             document.getElementById('player-name').textContent = players[currentPlayerIndex];
             document.getElementById('show-role-btn').style.display = 'inline-block';
             document.getElementById('next-player-btn').style.display = 'none';
         }
 
+        // Show the role when clicked
         document.getElementById('show-role-btn').addEventListener('click', function () {
             let word = getRandomWord();
             if (playerRoles[currentPlayerIndex] === 'Spy') {
@@ -96,6 +101,7 @@
             document.getElementById('next-player-btn').style.display = 'inline-block';
         });
 
+        // Move to next player when clicked
         document.getElementById('next-player-btn').addEventListener('click', function () {
             currentPlayerIndex++;
             if (currentPlayerIndex < players.length) {
@@ -106,15 +112,17 @@
             }
         });
 
+        // Restart the game without asking for names again
         document.getElementById('restart-btn').addEventListener('click', function () {
             currentPlayerIndex = 0;
-            playerRoles = [];
-            document.getElementById('player-names').style.display = 'inline-block';
-            document.getElementById('start-btn').style.display = 'inline-block';
-            document.getElementById('game-container').style.display = 'none';
+            playerRoles = assignRoles(players.length);  // Reassign roles for a new round
+            document.getElementById('player-name').textContent = players[currentPlayerIndex]; // Show first player's name
+            document.getElementById('show-role-btn').style.display = 'inline-block';
+            document.getElementById('next-player-btn').style.display = 'none';
             document.getElementById('restart-btn').style.display = 'none';
         });
 
+        // Randomly select a word from the list
         function getRandomWord() {
             const randomIndex = Math.floor(Math.random() * words.length);
             return words[randomIndex];
