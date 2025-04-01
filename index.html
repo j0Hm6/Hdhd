@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spy Word Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+        .card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 10px auto;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Spy Word Game</h1>
+    <div id="setup" class="card">
+        <input type="text" id="playerName" placeholder="Enter your name">
+        <button onclick="addPlayer()">Join</button>
+        <p>Players: <span id="playersList"></span></p>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+    <div id="game" class="card hidden">
+        <h2>Game Started!</h2>
+        <p id="roleMessage"></p>
+        <button onclick="resetGame()">Restart</button>
+    </div>
+    <script>
+        let players = [];
+        let spy = null;
+        let assignedWord = null;
+        const words = ["S3", "Shayka", "Kaldırım"];
+
+        function addPlayer() {
+            const nameInput = document.getElementById("playerName").value;
+            if (nameInput && !players.includes(nameInput)) {
+                players.push(nameInput);
+                document.getElementById("playersList").innerText = players.join(", ");
+                document.getElementById("playerName").value = "";
+            }
+        }
+
+        function startGame() {
+            if (players.length < 3) {
+                alert("At least 3 players required");
+                return;
+            }
+            spy = players[Math.floor(Math.random() * players.length)];
+            assignedWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById("setup").classList.add("hidden");
+            document.getElementById("game").classList.remove("hidden");
+            const playerName = prompt("Enter your name again to get your role");
+            if (playerName === spy) {
+                document.getElementById("roleMessage").innerText = "You are the Spy! Try to guess the word.";
+            } else {
+                document.getElementById("roleMessage").innerText = `Your word: ${assignedWord}`;
+            }
+        }
+
+        function resetGame() {
+            players = [];
+            spy = null;
+            assignedWord = null;
+            document.getElementById("setup").classList.remove("hidden");
+            document.getElementById("game").classList.add("hidden");
+            document.getElementById("playersList").innerText = "";
+        }
+    </script>
+</body>
+</html>
