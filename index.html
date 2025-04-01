@@ -9,6 +9,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 50px;
+            user-select: none;
         }
         .hidden {
             display: none;
@@ -30,22 +31,36 @@
 </head>
 <body>
     <h1>Spy Word Game</h1>
+    
     <div id="setup" class="card">
         <textarea id="playersInput" placeholder="Enter player names (comma-separated)"></textarea>
         <button onclick="startGame()">Start Game</button>
     </div>
-    <div id="game" class="card hidden">
-        <h2>Game Started!</h2>
-        <p id="roleMessage"></p>
+    
+    <div id="reveal" class="card hidden" onclick="showRole()">
+        <h2 id="playerName"></h2>
+        <p id="instruction">Tap to reveal your role</p>
+    </div>
+    
+    <div id="roleDisplay" class="card hidden" onclick="nextPlayer()">
+        <h2 id="roleMessage"></h2>
+        <p>Tap to continue</p>
+    </div>
+    
+    <div id="endScreen" class="card hidden">
+        <h2>All players have seen their roles!</h2>
         <button onclick="resetGame()">Restart</button>
     </div>
+    
     <script>
         const words = ["S3", "Shayka", "Kaldırım"];
+        let players = [];
         let spy = null;
         let assignedWord = null;
+        let currentIndex = 0;
 
         function startGame() {
-            const players = document.getElementById("playersInput").value.split(",").map(p => p.trim());
+            players = document.getElementById("playersInput").value.split(",").map(p => p.trim());
             if (players.length < 3) {
                 alert("At least 3 players required");
                 return;
@@ -53,15 +68,39 @@
             spy = players[Math.floor(Math.random() * players.length)];
             assignedWord = words[Math.floor(Math.random() * words.length)];
             document.getElementById("setup").classList.add("hidden");
-            document.getElementById("game").classList.remove("hidden");
-            const playerName = prompt("Enter your name to see your role");
+            document.getElementById("reveal").classList.remove("hidden");
+            showNextPlayer();
+        }
+
+        function showNextPlayer() {
+            if (currentIndex < players.length) {
+                document.getElementById("playerName").innerText = players[currentIndex];
+                document.getElementById("reveal").classList.remove("hidden");
+                document.getElementById("roleDisplay").classList.add("hidden");
+            } else {
+                document.getElementById("endScreen").classList.remove("hidden");
+            }
+        }
+
+        function showRole() {
+            const currentPlayer = players[currentIndex];
             document.getElementById("roleMessage").innerText = 
-                playerName === spy ? "You are the Spy! Try to guess the word." : `Your word: ${assignedWord}`;
+                currentPlayer === spy ? "You are the Spy! Try to guess the word." : `Your word: ${assignedWord}`;
+            document.getElementById("reveal").classList.add("hidden");
+            document.getElementById("roleDisplay").classList.remove("hidden");
+        }
+
+        function nextPlayer() {
+            currentIndex++;
+            showNextPlayer();
         }
 
         function resetGame() {
             document.getElementById("setup").classList.remove("hidden");
-            document.getElementById("game").classList.add("hidden");
+            document.getElementById("reveal").classList.add("hidden");
+            document.getElementById("roleDisplay").classList.add("hidden");
+            document.getElementById("endScreen").classList.add("hidden");
+            currentIndex = 0;
         }
     </script>
 </body>
