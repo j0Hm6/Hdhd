@@ -99,6 +99,7 @@
         function showRoleButton() {
             const roleDisplay = document.getElementById('role-display');
             document.getElementById('show-role-btn').style.display = 'inline-block';
+            document.getElementById('understand-btn').style.display = 'none'; // Hide "Anladım" button initially
             document.getElementById('show-role-btn').addEventListener('click', function() {
                 displayRole();
             });
@@ -112,8 +113,8 @@
             } else {
                 roleDisplay.textContent = `Your word is: ${wordForNonSpies}`;
             }
-            document.getElementById('show-role-btn').style.display = 'none';
-            document.getElementById('understand-btn').style.display = 'inline-block';
+            document.getElementById('show-role-btn').style.display = 'none'; // Hide "Göster" button after revealing role
+            document.getElementById('understand-btn').style.display = 'inline-block'; // Show "Anladım" button
         }
 
         // Proceed to the next player when clicked "Anladım"
