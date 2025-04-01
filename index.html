@@ -37,14 +37,14 @@
         <button onclick="startGame()">Start Game</button>
     </div>
     
-    <div id="reveal" class="card hidden" onclick="showRole()">
+    <div id="showPlayer" class="card hidden">
         <h2 id="playerName"></h2>
-        <p id="instruction">Tap to reveal your role</p>
+        <button onclick="showRole()">Show Role</button>
     </div>
     
-    <div id="roleDisplay" class="card hidden" onclick="nextPlayer()">
+    <div id="roleDisplay" class="card hidden">
         <h2 id="roleMessage"></h2>
-        <p>Tap to continue</p>
+        <button onclick="nextPlayer()">Next Player</button>
     </div>
     
     <div id="endScreen" class="card hidden">
@@ -68,16 +68,17 @@
             spy = players[Math.floor(Math.random() * players.length)];
             assignedWord = words[Math.floor(Math.random() * words.length)];
             document.getElementById("setup").classList.add("hidden");
-            document.getElementById("reveal").classList.remove("hidden");
+            document.getElementById("showPlayer").classList.remove("hidden");
             showNextPlayer();
         }
 
         function showNextPlayer() {
             if (currentIndex < players.length) {
                 document.getElementById("playerName").innerText = players[currentIndex];
-                document.getElementById("reveal").classList.remove("hidden");
+                document.getElementById("showPlayer").classList.remove("hidden");
                 document.getElementById("roleDisplay").classList.add("hidden");
             } else {
+                document.getElementById("showPlayer").classList.add("hidden");
                 document.getElementById("endScreen").classList.remove("hidden");
             }
         }
@@ -86,7 +87,7 @@
             const currentPlayer = players[currentIndex];
             document.getElementById("roleMessage").innerText = 
                 currentPlayer === spy ? "You are the Spy! Try to guess the word." : `Your word: ${assignedWord}`;
-            document.getElementById("reveal").classList.add("hidden");
+            document.getElementById("showPlayer").classList.add("hidden");
             document.getElementById("roleDisplay").classList.remove("hidden");
         }
 
@@ -97,7 +98,7 @@
 
         function resetGame() {
             document.getElementById("setup").classList.remove("hidden");
-            document.getElementById("reveal").classList.add("hidden");
+            document.getElementById("showPlayer").classList.add("hidden");
             document.getElementById("roleDisplay").classList.add("hidden");
             document.getElementById("endScreen").classList.add("hidden");
             currentIndex = 0;
