@@ -53,6 +53,7 @@
         let players = [];
         let currentPlayerIndex = 0;
         let playerRoles = [];
+        let wordForNonSpies = '';
 
         // Start Game after entering names
         document.getElementById('start-btn').addEventListener('click', function () {
@@ -71,6 +72,7 @@
             document.getElementById('start-btn').style.display = 'none';
             document.getElementById('game-container').style.display = 'block';
             playerRoles = assignRoles(players.length);
+            wordForNonSpies = getRandomWord(); // Get the word for non-spies
             showPlayer();
         }
 
@@ -91,11 +93,10 @@
 
         // Show the role when clicked
         document.getElementById('show-role-btn').addEventListener('click', function () {
-            let word = getRandomWord();
             if (playerRoles[currentPlayerIndex] === 'Spy') {
                 alert('You are the Spy!');
             } else {
-                alert(`Your word is: ${word}`);
+                alert(`Your word is: ${wordForNonSpies}`);
             }
             document.getElementById('show-role-btn').style.display = 'none';
             document.getElementById('next-player-btn').style.display = 'inline-block';
@@ -112,10 +113,11 @@
             }
         });
 
-        // Restart the game without asking for names again
+        // Restart the game without re-entering names
         document.getElementById('restart-btn').addEventListener('click', function () {
             currentPlayerIndex = 0;
             playerRoles = assignRoles(players.length);  // Reassign roles for a new round
+            wordForNonSpies = getRandomWord(); // Get a new word for non-spies
             document.getElementById('player-name').textContent = players[currentPlayerIndex]; // Show first player's name
             document.getElementById('show-role-btn').style.display = 'inline-block';
             document.getElementById('next-player-btn').style.display = 'none';
