@@ -3,105 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spy Word Game</title>
+    <title>Spy Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 50px;
-            user-select: none;
+            margin-top: 50px;
         }
-        .hidden {
-            display: none;
-        }
-        .card {
-            border: 1px solid #ccc;
-            padding: 20px;
-            margin: 10px auto;
-            width: 300px;
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        input, button {
+            font-size: 18px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
         }
         button {
-            padding: 10px;
-            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
             cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #game-container {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Spy Word Game</h1>
-    
-    <div id="setup" class="card">
-        <textarea id="playersInput" placeholder="Enter player names (comma-separated)"></textarea>
-        <button onclick="startGame()">Start Game</button>
+
+    <h1>Spy Game</h1>
+    <p>Enter player names (comma separated):</p>
+    <input type="text" id="player-names" placeholder="Enter player names">
+    <button id="start-btn">Start Game</button>
+
+    <div id="game-container">
+        <h2 id="player-name"></h2>
+        <button id="show-role-btn">Show Role</button>
+        <button id="next-player-btn" style="display: none;">Next Player</button>
+        <button id="restart-btn" style="display: none;">Restart Game</button>
     </div>
-    
-    <div id="showPlayer" class="card hidden">
-        <h2 id="playerName"></h2>
-        <button onclick="showRole()">Show Role</button>
-    </div>
-    
-    <div id="roleDisplay" class="card hidden">
-        <h2 id="roleMessage"></h2>
-        <button onclick="nextPlayer()">Next Player</button>
-    </div>
-    
-    <div id="endScreen" class="card hidden">
-        <h2>All players have seen their roles!</h2>
-        <button onclick="resetGame()">Restart</button>
-    </div>
-    
+
     <script>
-        const words = ["S3", "Shayka", "Kaldırım"];
+        const words = [
+            "Cadde", "Park", "Okul", "Pazar", "Hastane", "Dura", "Meydan", "Köprü", "Alışveriş Merkezi", "Restoran", // Places in City
+            "Sandalye", "Masa", "Lamba", "Televizyon", "Yatak", "Kapı", "Pencere", "Bisiklet", "Araba", "Bank", // Items in City/Village
+            "Çay", "Kahve", "Ayran", "Şarap", "Limonata", "Su", "Süt", "Soda" // Beverages
+        ];
+
         let players = [];
-        let spy = null;
-        let assignedWord = null;
-        let currentIndex = 0;
+        let currentPlayerIndex = 0;
+        let playerRoles = [];
+
+        document.getElementById('start-btn').addEventListener('click', function () {
+            let names = document.getElementById('player-names').value;
+            players = names.split(',').map(name => name.trim());
+            if (players.length > 1) {
+                startGame();
+            } else {
+                alert('Please enter at least two players.');
+            }
+        });
 
         function startGame() {
-            players = document.getElementById("playersInput").value.split(",").map(p => p.trim());
-            if (players.length < 3) {
-                alert("At least 3 players required");
-                return;
-            }
-            spy = players[Math.floor(Math.random() * players.length)];
-            assignedWord = words[Math.floor(Math.random() * words.length)];
-            document.getElementById("setup").classList.add("hidden");
-            document.getElementById("showPlayer").classList.remove("hidden");
-            showNextPlayer();
+            document.querySelector('input').style.display = 'none';
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            playerRoles = assignRoles(players.length);
+            showPlayer();
         }
 
-        function showNextPlayer() {
-            if (currentIndex < players.length) {
-                document.getElementById("playerName").innerText = players[currentIndex];
-                document.getElementById("showPlayer").classList.remove("hidden");
-                document.getElementById("roleDisplay").classList.add("hidden");
+        function assignRoles(playerCount) {
+            let roles = Array(playerCount).fill('Word');
+            const spyIndex = Math.floor(Math.random() * playerCount);
+            roles[spyIndex] = 'Spy';
+            return roles;
+        }
+
+        function showPlayer() {
+            document.getElementById('player-name').textContent = players[currentPlayerIndex];
+            document.getElementById('show-role-btn').style.display = 'inline-block';
+            document.getElementById('next-player-btn').style.display = 'none';
+        }
+
+        document.getElementById('show-role-btn').addEventListener('click', function () {
+            let word = getRandomWord();
+            if (playerRoles[currentPlayerIndex] === 'Spy') {
+                alert('You are the Spy!');
             } else {
-                document.getElementById("showPlayer").classList.add("hidden");
-                document.getElementById("endScreen").classList.remove("hidden");
+                alert(`Your word is: ${word}`);
             }
-        }
+            document.getElementById('show-role-btn').style.display = 'none';
+            document.getElementById('next-player-btn').style.display = 'inline-block';
+        });
 
-        function showRole() {
-            const currentPlayer = players[currentIndex];
-            document.getElementById("roleMessage").innerText = 
-                currentPlayer === spy ? "You are the Spy! Try to guess the word." : `Your word: ${assignedWord}`;
-            document.getElementById("showPlayer").classList.add("hidden");
-            document.getElementById("roleDisplay").classList.remove("hidden");
-        }
+        document.getElementById('next-player-btn').addEventListener('click', function () {
+            currentPlayerIndex++;
+            if (currentPlayerIndex < players.length) {
+                showPlayer();
+            } else {
+                document.getElementById('next-player-btn').style.display = 'none';
+                document.getElementById('restart-btn').style.display = 'inline-block';
+            }
+        });
 
-        function nextPlayer() {
-            currentIndex++;
-            showNextPlayer();
-        }
+        document.getElementById('restart-btn').addEventListener('click', function () {
+            currentPlayerIndex = 0;
+            playerRoles = [];
+            document.getElementById('player-names').style.display = 'inline-block';
+            document.getElementById('start-btn').style.display = 'inline-block';
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('restart-btn').style.display = 'none';
+        });
 
-        function resetGame() {
-            document.getElementById("setup").classList.remove("hidden");
-            document.getElementById("showPlayer").classList.add("hidden");
-            document.getElementById("roleDisplay").classList.add("hidden");
-            document.getElementById("endScreen").classList.add("hidden");
-            currentIndex = 0;
+        function getRandomWord() {
+            const randomIndex = Math.floor(Math.random() * words.length);
+            return words[randomIndex];
         }
     </script>
 </body>
