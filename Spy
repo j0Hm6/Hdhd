@@ -1,0 +1,72 @@
+import { useState, useEffect } from "react";
+import { Button, Input } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+
+const words = ["S3", "Shayka", "Kaldırım"];
+
+export default function SpyGame() {
+  const [players, setPlayers] = useState([]);
+  const [name, setName] = useState("");
+  const [gameStarted, setGameStarted] = useState(false);
+  const [spy, setSpy] = useState(null);
+  const [assignedWord, setAssignedWord] = useState(null);
+
+  const addPlayer = () => {
+    if (name && !players.includes(name)) {
+      setPlayers([...players, name]);
+      setName("");
+    }
+  };
+
+  const startGame = () => {
+    if (players.length < 3) return alert("At least 3 players required");
+    const randomSpy = players[Math.floor(Math.random() * players.length)];
+    setSpy(randomSpy);
+    setAssignedWord(words[Math.floor(Math.random() * words.length)]);
+    setGameStarted(true);
+  };
+
+  const resetGame = () => {
+    setPlayers([]);
+    setSpy(null);
+    setAssignedWord(null);
+    setGameStarted(false);
+  };
+
+  return (
+    <div className="flex flex-col items-center p-4">
+      {!gameStarted ? (
+        <Card className="p-4 w-80">
+          <CardContent>
+            <h2 className="text-xl font-bold">Spy Word Game</h2>
+            <Input
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <Button onClick={addPlayer} className="mt-2">Join</Button>
+            <p className="mt-2">Players: {players.join(", ")}</p>
+            <Button onClick={startGame} className="mt-4" disabled={players.length < 3}>
+              Start Game
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="p-4 w-80">
+          <CardContent>
+            <h2 className="text-xl font-bold">Game Started!</h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-2"
+            >
+              {spy === name ? "You are the Spy! Try to guess the word." : `Your word: ${assignedWord}`}
+            </motion.p>
+            <Button onClick={resetGame} className="mt-4">Restart</Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
