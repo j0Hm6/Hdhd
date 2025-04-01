@@ -100,6 +100,7 @@
             const roleDisplay = document.getElementById('role-display');
             document.getElementById('show-role-btn').style.display = 'inline-block';
             document.getElementById('understand-btn').style.display = 'none'; // Hide "Anladım" button initially
+            document.getElementById('role-display').textContent = ''; // Clear role display text from previous players
             document.getElementById('show-role-btn').addEventListener('click', function() {
                 displayRole();
             });
