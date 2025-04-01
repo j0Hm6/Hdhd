@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spy Word Game</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,41 +44,61 @@
         <button onclick="resetGame()">Restart</button>
     </div>
     <script>
-        let players = [];
-        let spy = null;
-        let assignedWord = null;
-        const words = ["S3", "Shayka", "Kaldırım"];
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const playersRef = db.ref("players");
+        const gameRef = db.ref("game");
 
         function addPlayer() {
             const nameInput = document.getElementById("playerName").value;
-            if (nameInput && !players.includes(nameInput)) {
-                players.push(nameInput);
-                document.getElementById("playersList").innerText = players.join(", ");
+            if (nameInput) {
+                playersRef.child(nameInput).set(true);
                 document.getElementById("playerName").value = "";
             }
         }
 
+        playersRef.on("value", (snapshot) => {
+            const players = snapshot.val();
+            document.getElementById("playersList").innerText = players ? Object.keys(players).join(", ") : "";
+        });
+
         function startGame() {
-            if (players.length < 3) {
-                alert("At least 3 players required");
-                return;
-            }
-            spy = players[Math.floor(Math.random() * players.length)];
-            assignedWord = words[Math.floor(Math.random() * words.length)];
-            document.getElementById("setup").classList.add("hidden");
-            document.getElementById("game").classList.remove("hidden");
-            const playerName = prompt("Enter your name again to get your role");
-            if (playerName === spy) {
-                document.getElementById("roleMessage").innerText = "You are the Spy! Try to guess the word.";
-            } else {
-                document.getElementById("roleMessage").innerText = `Your word: ${assignedWord}`;
-            }
+            playersRef.once("value", (snapshot) => {
+                const players = Object.keys(snapshot.val() || {});
+                if (players.length < 3) {
+                    alert("At least 3 players required");
+                    return;
+                }
+                const spy = players[Math.floor(Math.random() * players.length)];
+                const word = ["S3", "Shayka", "Kaldırım"][Math.floor(Math.random() * 3)];
+                gameRef.set({ spy, word });
+                document.getElementById("setup").classList.add("hidden");
+                document.getElementById("game").classList.remove("hidden");
+            });
         }
 
+        gameRef.on("value", (snapshot) => {
+            const gameData = snapshot.val();
+            if (gameData) {
+                const playerName = prompt("Enter your name again to get your role");
+                document.getElementById("roleMessage").innerText = 
+                    playerName === gameData.spy ? "You are the Spy! Try to guess the word." : `Your word: ${gameData.word}`;
+            }
+        });
+
         function resetGame() {
-            players = [];
-            spy = null;
-            assignedWord = null;
+            playersRef.remove();
+            gameRef.remove();
             document.getElementById("setup").classList.remove("hidden");
             document.getElementById("game").classList.add("hidden");
             document.getElementById("playersList").innerText = "";
