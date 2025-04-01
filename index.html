@@ -44,7 +44,8 @@
     <div id="game-container">
         <h2 id="player-name"></h2>
         <div id="role-display"></div>
-        <div id="timer" style="display: none;">Time left: 10:00</div>
+        <button id="understand-btn">Anladım</button>
+        <div id="timer" style="display: none;">Game has started!</div>
     </div>
 
     <script>
@@ -57,8 +58,6 @@
         let currentPlayerIndex = 0;
         let playerRoles = [];
         let wordForNonSpies = '';
-        let timer;
-        let timeLeft = 600; // Set the timer to 10 minutes (600 seconds)
 
         // Start Game after entering names
         document.getElementById('start-btn').addEventListener('click', function () {
@@ -103,20 +102,21 @@
             } else {
                 roleDisplay.textContent = `Your word is: ${wordForNonSpies}`;
             }
-            setTimeout(nextPlayer, 3000); // Wait 3 seconds before moving to the next player
+            document.getElementById('understand-btn').style.display = 'inline-block';
         }
 
-        // Proceed to the next player automatically after a few seconds
-        function nextPlayer() {
+        // Proceed to the next player when clicked "Anladım"
+        document.getElementById('understand-btn').addEventListener('click', function () {
             currentPlayerIndex++;
             if (currentPlayerIndex < players.length) {
                 showPlayer();
             } else {
                 document.getElementById('role-display').textContent = "All players have seen their roles!";
+                document.getElementById('understand-btn').style.display = 'none';
                 document.getElementById('timer').style.display = 'inline-block';
-                startTimer(); // Start the timer after the last player has viewed their role
+                startGameStart(); // Game starts after all players have seen their roles
             }
-        }
+        });
 
         // Randomly select a word from the list
         function getRandomWord() {
@@ -124,29 +124,10 @@
             return words[randomIndex];
         }
 
-        // Start the chronometer once the last player has viewed their role
-        function startTimer() {
-            timer = setInterval(function () {
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    alert("Time's up!");
-                } else {
-                    timeLeft--;
-                    updateTimerDisplay();
-                }
-            }, 1000);
-        }
-
-        // Update the timer display
-        function updateTimerDisplay() {
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-            document.getElementById('timer').textContent = `Time left: ${pad(minutes)}:${pad(seconds)}`;
-        }
-
-        // Add leading zero to single digit minutes and seconds
-        function pad(num) {
-            return num < 10 ? '0' + num : num;
+        // Game starts after the last player has clicked "Anladım"
+        function startGameStart() {
+            document.getElementById('timer').textContent = "Game has started!";
+            // You can add any additional logic to start the game, such as time limit or countdown here if needed
         }
 
         // Restart the game without re-entering names
@@ -157,13 +138,6 @@
             document.getElementById('player-name').textContent = players[currentPlayerIndex]; // Show first player's name
             document.getElementById('role-display').textContent = '';
             document.getElementById('timer').style.display = 'none';
-            resetTimer(); // Reset the timer
-        }
-
-        // Reset the timer for the next round
-        function resetTimer() {
-            timeLeft = 600; // Reset to 10 minutes (600 seconds)
-            updateTimerDisplay();
         }
     </script>
 </body>
