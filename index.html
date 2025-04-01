@@ -27,6 +27,11 @@
         #game-container {
             display: none;
         }
+        #timer {
+            font-size: 24px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -41,6 +46,7 @@
         <button id="show-role-btn">Show Role</button>
         <button id="next-player-btn" style="display: none;">Next Player</button>
         <button id="restart-btn" style="display: none;">Restart Game</button>
+        <div id="timer" style="display: none;">Time left: 00:00</div>
     </div>
 
     <script>
@@ -53,6 +59,8 @@
         let currentPlayerIndex = 0;
         let playerRoles = [];
         let wordForNonSpies = '';
+        let timer;
+        let timeLeft = 60; // Set the timer to 60 seconds for each round
 
         // Start Game after entering names
         document.getElementById('start-btn').addEventListener('click', function () {
@@ -109,6 +117,7 @@
             } else {
                 document.getElementById('next-player-btn').style.display = 'none';
                 document.getElementById('restart-btn').style.display = 'inline-block';
+                startTimer(); // Start the timer after the last player
             }
         });
 
@@ -121,12 +130,46 @@
             document.getElementById('show-role-btn').style.display = 'inline-block';
             document.getElementById('next-player-btn').style.display = 'none';
             document.getElementById('restart-btn').style.display = 'none';
+            resetTimer(); // Reset the timer
         });
 
         // Randomly select a word from the list
         function getRandomWord() {
             const randomIndex = Math.floor(Math.random() * words.length);
             return words[randomIndex];
+        }
+
+        // Start the chronometer once the last player has viewed their role
+        function startTimer() {
+            document.getElementById('timer').style.display = 'inline-block';
+            timer = setInterval(function () {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert("Time's up!");
+                } else {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        // Update the timer display
+        function updateTimerDisplay() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `Time left: ${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        // Add leading zero to single digit minutes and seconds
+        function pad(num) {
+            return num < 10 ? '0' + num : num;
+        }
+
+        // Reset the timer for the next round
+        function resetTimer() {
+            timeLeft = 60; // Reset to 60 seconds
+            updateTimerDisplay();
+            document.getElementById('timer').style.display = 'none';
         }
     </script>
 </body>
