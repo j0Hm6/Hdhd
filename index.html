@@ -44,9 +44,9 @@
     <div id="game-container">
         <h2 id="player-name"></h2>
         <button id="show-role-btn">Show Role</button>
-        <button id="next-player-btn" style="display: none;">Next Player</button>
+        <button id="ok-btn" style="display: none;">OK</button>
         <button id="restart-btn" style="display: none;">Restart Game</button>
-        <div id="timer" style="display: none;">Time left: 00:00</div>
+        <div id="timer" style="display: none;">Time left: 10:00</div>
     </div>
 
     <script>
@@ -60,7 +60,7 @@
         let playerRoles = [];
         let wordForNonSpies = '';
         let timer;
-        let timeLeft = 60; // Set the timer to 60 seconds for each round
+        let timeLeft = 600; // Set the timer to 10 minutes (600 seconds)
 
         // Start Game after entering names
         document.getElementById('start-btn').addEventListener('click', function () {
@@ -95,7 +95,7 @@
         function showPlayer() {
             document.getElementById('player-name').textContent = players[currentPlayerIndex];
             document.getElementById('show-role-btn').style.display = 'inline-block';
-            document.getElementById('next-player-btn').style.display = 'none';
+            document.getElementById('ok-btn').style.display = 'none';
         }
 
         // Show the role when clicked
@@ -106,16 +106,16 @@
                 alert(`Your word is: ${wordForNonSpies}`);
             }
             document.getElementById('show-role-btn').style.display = 'none';
-            document.getElementById('next-player-btn').style.display = 'inline-block';
+            document.getElementById('ok-btn').style.display = 'inline-block';
         });
 
-        // Move to next player when clicked
-        document.getElementById('next-player-btn').addEventListener('click', function () {
+        // Proceed to the next player when clicked "OK"
+        document.getElementById('ok-btn').addEventListener('click', function () {
             currentPlayerIndex++;
             if (currentPlayerIndex < players.length) {
                 showPlayer();
             } else {
-                document.getElementById('next-player-btn').style.display = 'none';
+                document.getElementById('ok-btn').style.display = 'none';
                 document.getElementById('restart-btn').style.display = 'inline-block';
                 startTimer(); // Start the timer after the last player
             }
@@ -128,7 +128,7 @@
             wordForNonSpies = getRandomWord(); // Get a new word for non-spies
             document.getElementById('player-name').textContent = players[currentPlayerIndex]; // Show first player's name
             document.getElementById('show-role-btn').style.display = 'inline-block';
-            document.getElementById('next-player-btn').style.display = 'none';
+            document.getElementById('ok-btn').style.display = 'none';
             document.getElementById('restart-btn').style.display = 'none';
             resetTimer(); // Reset the timer
         });
@@ -167,7 +167,7 @@
 
         // Reset the timer for the next round
         function resetTimer() {
-            timeLeft = 60; // Reset to 60 seconds
+            timeLeft = 600; // Reset to 10 minutes (600 seconds)
             updateTimerDisplay();
             document.getElementById('timer').style.display = 'none';
         }
