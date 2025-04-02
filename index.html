@@ -46,7 +46,8 @@
         <div id="role-display"></div>
         <button id="show-role-btn">Göster</button>
         <button id="understand-btn" style="display: none;">Anladım</button>
-        <div id="timer" style="display: none;">Game has started!</div>
+        <div id="timer" style="display: none;">10:00</div>
+        <button id="restart-btn" style="display: none;">Restart</button>
     </div>
 
     <script>
@@ -59,6 +60,7 @@
         let currentPlayerIndex = 0;
         let playerRoles = [];
         let wordForNonSpies = '';
+        let timerInterval;
 
         // Start Game after entering names
         document.getElementById('start-btn').addEventListener('click', function () {
@@ -77,7 +79,7 @@
             document.getElementById('start-btn').style.display = 'none';
             document.getElementById('game-container').style.display = 'block';
             playerRoles = assignRoles(players.length);
-            wordForNonSpies = getRandomWord(); // Get the word for non-spies, chosen once at the start
+            wordForNonSpies = getRandomWord(); // Get the word for non-spies
             showPlayer();
         }
 
@@ -92,18 +94,17 @@
         // Display the current player's name
         function showPlayer() {
             document.getElementById('player-name').textContent = players[currentPlayerIndex];
-            showRoleButton(); // Show the "Göster" button after displaying the player's name
+            showRoleButton(); // Show the "Göster" button
         }
 
         // Show the "Göster" button, which reveals the role
         function showRoleButton() {
-            const roleDisplay = document.getElementById('role-display');
+            document.getElementById('role-display').textContent = ''; // Clear previous role
             document.getElementById('show-role-btn').style.display = 'inline-block';
-            document.getElementById('understand-btn').style.display = 'none'; // Hide "Anladım" button initially
-            document.getElementById('role-display').textContent = ''; // Clear role display text from previous players
+            document.getElementById('understand-btn').style.display = 'none';
             document.getElementById('show-role-btn').addEventListener('click', function() {
                 displayRole();
-            });
+            }, { once: true });
         }
 
         // Display the role (Word or Spy)
@@ -114,11 +115,11 @@
             } else {
                 roleDisplay.textContent = `Your word is: ${wordForNonSpies}`;
             }
-            document.getElementById('show-role-btn').style.display = 'none'; // Hide "Göster" button after revealing role
+            document.getElementById('show-role-btn').style.display = 'none'; // Hide "Göster" button
             document.getElementById('understand-btn').style.display = 'inline-block'; // Show "Anladım" button
         }
 
-        // Proceed to the next player when clicked "Anladım"
+        // Proceed to the next player when clicking "Anladım"
         document.getElementById('understand-btn').addEventListener('click', function () {
             currentPlayerIndex++;
             if (currentPlayerIndex < players.length) {
@@ -127,8 +128,44 @@
                 document.getElementById('role-display').textContent = "All players have seen their roles!";
                 document.getElementById('understand-btn').style.display = 'none';
                 document.getElementById('timer').style.display = 'inline-block';
-                startGameStart(); // Game starts after all players have seen their roles
+                startTimer(10 * 60); // Start the 10-minute timer
+                document.getElementById('restart-btn').style.display = 'inline-block'; // Show Restart button
             }
+        });
+
+        // Start 10-minute countdown timer
+        function startTimer(duration) {
+            let timeLeft = duration;
+            document.getElementById('timer').textContent = formatTime(timeLeft);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = formatTime(timeLeft);
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').textContent = "Time's up!";
+                }
+            }, 1000);
+        }
+
+        // Format timer to MM:SS
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Restart the game without re-entering names
+        document.getElementById('restart-btn').addEventListener('click', function () {
+            clearInterval(timerInterval); // Stop the timer
+            currentPlayerIndex = 0;
+            playerRoles = assignRoles(players.length); // Reassign roles for a new round
+            wordForNonSpies = getRandomWord(); // Get a new word for non-spies
+            document.getElementById('player-name').textContent = players[currentPlayerIndex]; // Show first player's name
+            document.getElementById('role-display').textContent = '';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('restart-btn').style.display = 'none';
+            showPlayer();
         });
 
         // Randomly select a word from the list
@@ -137,21 +174,6 @@
             return words[randomIndex];
         }
 
-        // Game starts after the last player has clicked "Anladım"
-        function startGameStart() {
-            document.getElementById('timer').textContent = "Game has started!";
-            // You can add any additional logic to start the game, such as time limit or countdown here if needed
-        }
-
-        // Restart the game without re-entering names
-        function resetGame() {
-            currentPlayerIndex = 0;
-            playerRoles = assignRoles(players.length);  // Reassign roles for a new round
-            wordForNonSpies = getRandomWord(); // Get a new word for non-spies
-            document.getElementById('player-name').textContent = players[currentPlayerIndex]; // Show first player's name
-            document.getElementById('role-display').textContent = '';
-            document.getElementById('timer').style.display = 'none';
-        }
     </script>
 </body>
 </html>
